@@ -27,6 +27,8 @@ module.exports = {
       "Access-Control-Allow-Headers":
         "Origin, X-Requested-With, Content-Type, Accept, Authorization",
       "Access-Control-Allow-Credentials": "true",
+      // Anti-MIME sniffing
+      "X-Content-Type-Options": "nosniff",
       // Anti-clickjacking
       "X-Frame-Options": "SAMEORIGIN",
       // Prefer CSP frame-ancestors; safe for modern browsers

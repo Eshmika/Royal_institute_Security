@@ -70,6 +70,20 @@ curl.exe -i http://localhost:3000/ | findstr /I "x-powered-by"
 
 Expected: no `X-Powered-By` header in either response.
 
+## Anti-MIME Sniffing
+
+- API: `helmet.noSniff()` adds `X-Content-Type-Options: nosniff`.
+- Dev server (3000): `craco.config.js` sets `X-Content-Type-Options: nosniff` in headers.
+
+Verify:
+
+```powershell
+curl.exe -i http://localhost:5000/ | findstr /I "x-content-type-options"
+curl.exe -i http://localhost:3000/ | findstr /I "x-content-type-options"
+```
+
+Expected: `X-Content-Type-Options: nosniff` present on both.
+
 ## Private IP disclosure (dev)
 
 Some dev setups embed the local network IP in the webpack dev server client (HMR) code, which can appear in `http://localhost:3000/static/js/bundle.js`.

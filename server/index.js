@@ -46,6 +46,9 @@ app.use(
   })
 );
 
+// Ensure anti-MIME sniffing header
+app.use(helmet.noSniff());
+
 // Configure a Content Security Policy that allows our front-end and Google Identity Services
 app.use(
   helmet.contentSecurityPolicy({
