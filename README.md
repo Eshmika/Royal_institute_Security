@@ -31,6 +31,22 @@ curl -i http://localhost:3000/ -H "Origin: http://localhost:3000"
 
 Expected: No wildcard `Access-Control-Allow-Origin: *`. Server should reflect allowed origin or block.
 
+## Private IP disclosure (dev)
+
+Some dev setups embed the local network IP in the webpack dev server client (HMR) code, which can appear in `http://localhost:3000/static/js/bundle.js`.
+
+Mitigation added:
+ - `frontend/craco.config.js` forces dev server `host` and client WebSocket hostname to `localhost`.
+ - `frontend/.env.development` sets `HOST` and `WDS_SOCKET_HOST` to `localhost`.
+
+Verify:
+ - Start the frontend with `npm start` in `frontend/`.
+ - Fetch the bundle and search for private IPs:
+   ```powershell
+   curl.exe -s http://localhost:3000/static/js/bundle.js | Select-String -Pattern '10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.'
+   ```
+   Expect no matches.
+
 # SLIIT-Y2S2-ITPproject-Royal_institute
 
 Royal Academy Education Institute is an institute management system designed to manage institute educational activities efficiently. This is a web-based application that was developed mainly based on eight functions, including user management, financial management, enrollment and attendance management, class management, lesson material management, timetable management, salary management, Q&A and feedback management. Through the use of the Royal Academy Education Institute, it helps students and teachers interact in a convenient manner, and it also helps managers and administrators manage institute tasks effectively and reliably. . We are using the MERN stack to implement this project. We are using the MERN stack to implement this project.
