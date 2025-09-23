@@ -1,3 +1,35 @@
+# Royal_institute_Security
+
+Royal Academy Education Institute is an institute management system designed to manage institute educational activities efficiently. This is a web-based application that was developed mainly based on eight functions, including user management, financial management, enrollment and attendance management, class management, lesson material management, timetable management, salary management, Q&A and feedback management. Through the use of the Royal Academy Education Institute, it helps students and teachers interact in a convenient manner, and it also helps managers and administrators manage institute tasks effectively and reliably. . We are using the MERN stack to implement this project. We are using the MERN stack to implement this project.
+
+## CORS hardening
+
+- Server now enforces a CORS allowlist using `CORS_ORIGINS` (comma-separated), defaulting to `http://localhost:3000`. Examples:
+
+PowerShell (current session only):
+
+```powershell
+$env:CORS_ORIGINS = "http://localhost:3000,https://yourdomain.example"
+```
+
+CMD:
+
+```bat
+set CORS_ORIGINS=http://localhost:3000,https://yourdomain.example
+```
+
+- Frontend dev server (CRA on port 3000) is configured via `frontend/craco.config.js` to avoid sending `Access-Control-Allow-Origin: *`. Use `npm start` from `frontend/` to apply this behavior.
+
+### Verify locally
+
+Use curl to check headers:
+
+```
+curl -i http://localhost:5000/ -H "Origin: http://localhost:3000"
+curl -i http://localhost:3000/ -H "Origin: http://localhost:3000"
+```
+
+Expected: No wildcard `Access-Control-Allow-Origin: *`. Server should reflect allowed origin or block.
 
 # SLIIT-Y2S2-ITPproject-Royal_institute
 
@@ -20,6 +52,7 @@ Backend
   npm i react-pdf
   npm i path
 ```
+
 Frontend
 
 ```bash
@@ -48,11 +81,13 @@ Frontend
   npm i react-transition-group
   npm install @react-pdf/renderer
 ```
+
 Main File
 
 ```bash
   npm i concurrently
 ```
+
 Start the server
 
 ```bash
