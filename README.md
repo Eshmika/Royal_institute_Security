@@ -43,6 +43,17 @@ Verify with:
 curl.exe -i http://localhost:3000/ | findstr /I "x-frame-options content-security-policy"
 ```
 
+## Private IP disclosure
+
+- Dev build source maps are disabled via `frontend/craco.config.js` to reduce risk of private IPs being embedded in `bundle.js`.
+- Dev server host and HMR WebSocket hostname are pinned to `localhost`.
+
+Verify with:
+```powershell
+curl.exe http://localhost:3000/static/js/bundle.js | findstr /R "\<10\.[0-9]\|\<192\.168\.|\<172\.(1[6-9]|2[0-9]|3[0-1])\."
+```
+Expected: no matches.
+
 ## Private IP disclosure (dev)
 
 Some dev setups embed the local network IP in the webpack dev server client (HMR) code, which can appear in `http://localhost:3000/static/js/bundle.js`.

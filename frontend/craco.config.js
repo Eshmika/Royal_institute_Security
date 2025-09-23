@@ -1,6 +1,13 @@
 // CRACO config to restrict webpack-dev-server CORS headers in development
 // This prevents Access-Control-Allow-Origin: * being sent from port 3000
 module.exports = {
+  // Disable dev source maps to avoid leaking private IPs in bundle.js
+  webpack: {
+    configure: (webpackConfig) => {
+      webpackConfig.devtool = false;
+      return webpackConfig;
+    },
+  },
   devServer: (devServerConfig) => {
     // Force dev server to bind to localhost to avoid embedding private IPs
     devServerConfig.host = "localhost";
@@ -8,6 +15,8 @@ module.exports = {
     if (!devServerConfig.client.webSocketURL)
       devServerConfig.client.webSocketURL = {};
     devServerConfig.client.webSocketURL.hostname = "localhost";
+    // Optionally pin the port if needed
+    // devServerConfig.client.webSocketURL.port = 3000;
     // If port is dynamic, leave it; CRA defaults to 3000
     // devServerConfig.client.webSocketURL.port = devServerConfig.port || 3000;
 
