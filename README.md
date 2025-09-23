@@ -49,10 +49,26 @@ curl.exe -i http://localhost:3000/ | findstr /I "x-frame-options content-securit
 - Dev server host and HMR WebSocket hostname are pinned to `localhost`.
 
 Verify with:
+
 ```powershell
 curl.exe http://localhost:3000/static/js/bundle.js | findstr /R "\<10\.[0-9]\|\<192\.168\.|\<172\.(1[6-9]|2[0-9]|3[0-1])\."
 ```
+
 Expected: no matches.
+
+## Suppress X-Powered-By
+
+- The API server disables Express’ `X-Powered-By` via `app.disable('x-powered-by')`.
+- The CRA dev server (port 3000) removes `X-Powered-By` in `frontend/craco.config.js` using `setupMiddlewares`.
+
+Verify:
+
+```powershell
+curl.exe -i http://localhost:5000/ | findstr /I "x-powered-by"
+curl.exe -i http://localhost:3000/ | findstr /I "x-powered-by"
+```
+
+Expected: no `X-Powered-By` header in either response.
 
 ## Private IP disclosure (dev)
 

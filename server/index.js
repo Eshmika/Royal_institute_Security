@@ -12,6 +12,9 @@ const BankModel = require("./models/BankPayments");
 const SalaryModel = require("./models/Salary");
 const PhotoModel = require("./models/ProfilePhoto");
 
+// Disable X-Powered-By header
+app.disable("x-powered-by");
+
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("MongoDB connected"))

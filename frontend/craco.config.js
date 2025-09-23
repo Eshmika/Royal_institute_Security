@@ -32,6 +32,22 @@ module.exports = {
       // Prefer CSP frame-ancestors; safe for modern browsers
       "Content-Security-Policy": "frame-ancestors 'self'",
     };
+
+    // Remove X-Powered-By header and disable Express-powered header on dev server
+    const originalSetup = devServerConfig.setupMiddlewares;
+    devServerConfig.setupMiddlewares = (middlewares, server) => {
+      if (server && server.app) {
+        try {
+          // Express app available via server.app
+          server.app.disable("x-powered-by");
+          server.app.use((req, res, next) => {
+            res.removeHeader("X-Powered-By");
+            next();
+          });
+        } catch (_) {}
+      }
+      return originalSetup ? originalSetup(middlewares, server) : middlewares;
+    };
     return devServerConfig;
   },
 };
