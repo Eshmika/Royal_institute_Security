@@ -5,6 +5,13 @@ const Admin = require('../models/Admin');
 const Wallet = require('../models/Wallets');
 const { hashPassword, comparePassword } = require('../helpers/auth');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+
+const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
+let googleClient;
+if (googleClientId && googleClientId.length > 0) {
+    googleClient = new OAuth2Client(googleClientId);
+}
 
 const test = (req, res) => {
     res.json('test is working')
@@ -935,6 +942,44 @@ module.exports = {
     test,
     registerStudent,
     loginStudent,
+    // Google OAuth (Student)
+    googleLoginStudent: async (req, res) => {
+        try {
+            if (!googleClientId || !googleClient) {
+                return res.status(500).json({ error: 'Google OAuth not configured on server' });
+            }
+            const { credential } = req.body || {};
+            if (!credential) {
+                return res.status(400).json({ error: 'Missing Google credential' });
+            }
+            // Verify ID token
+            const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: googleClientId });
+            const payload = ticket.getPayload();
+            const email = payload?.email;
+            const name = payload?.name;
+            if (!email) {
+                return res.status(400).json({ error: 'Google account has no email' });
+            }
+
+            // Find existing student by email
+            const student = await Student.findOne({ email });
+            if (!student) {
+                return res.status(404).json({ error: 'No student found for this Google email. Please register first.' });
+            }
+
+            // Issue same JWT cookie as password login
+            jwt.sign({ id: student._id }, process.env.JWT_SECRET, { expiresIn: '1d' }, (err, token) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ error: 'Failed to create session' });
+                }
+                res.cookie('token', token).json(student);
+            });
+        } catch (error) {
+            console.error('googleLoginStudent error', error);
+            return res.status(401).json({ error: 'Invalid Google credential' });
+        }
+    },
     forgotPasswordstudent,
     getProfile,
     getProfileid,

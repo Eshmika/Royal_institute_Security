@@ -4,6 +4,7 @@ const cors = require('cors');
 const { test,
     registerStudent,
     loginStudent,
+    googleLoginStudent,
     forgotPasswordstudent,
     getProfile,
     getProfileid,
@@ -46,6 +47,7 @@ router.get('/', test)
 
 router.post('/register', registerStudent)
 router.post('/login', loginStudent)
+router.post('/google-login', googleLoginStudent)
 router.post('/forgotpassword', forgotPasswordstudent)
 router.get('/studentprofile', getProfile)
 router.get('/studentprofileid/:id', getProfileid)
