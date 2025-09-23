@@ -35,7 +35,8 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0"
+    "@craco/craco": "^7.1.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "eslintConfig": {
     "extends": [
@@ -54,8 +55,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
