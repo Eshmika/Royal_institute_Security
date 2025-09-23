@@ -29,38 +29,63 @@ function StudentLogin() {
     }
   }
   
-  // Google Sign-In setup
+  // Google Sign-In setup (load GIS script dynamically)
   useEffect(() => {
-    /* global google */
-  const clientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
-    if (!window.google || !clientId) return;
-    try {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response) => {
-          try {
-            const { data: resp } = await axios.post('/google-login', { credential: response.credential });
-            if (resp?.error) {
-              toast.error(resp.error);
-              return;
+    const clientId = (process.env.REACT_APP_GOOGLE_CLIENT_ID || '').trim();
+    if (!clientId) return;
+
+    const initialize = () => {
+      try {
+        // @ts-ignore - google global injected by GIS script
+        if (!window.google?.accounts?.id) return;
+        // @ts-ignore
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            try {
+              const { data: resp } = await axios.post('/google-login', { credential: response.credential });
+              if (resp?.error) {
+                toast.error(resp.error);
+                return;
+              }
+              navigate('/studentdashboard');
+            } catch (err) {
+              console.error(err);
+              toast.error('Google Sign-In failed');
             }
-            navigate('/studentdashboard');
-          } catch (err) {
-            console.error(err);
-            toast.error('Google Sign-In failed');
-          }
-        },
-        context: 'signin',
-        auto_select: false
-      });
-      // Render button
-      window.google.accounts.id.renderButton(
-        document.getElementById('googleSignInDiv'),
-        { theme: 'outline', size: 'large', shape: 'rectangular', width: 320 }
-      );
-    } catch (e) {
-      console.error(e);
+          },
+          context: 'signin',
+          auto_select: false
+        });
+        // @ts-ignore
+        window.google.accounts.id.renderButton(
+          document.getElementById('googleSignInDiv'),
+          { theme: 'outline', size: 'large', shape: 'rectangular', width: 320 }
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    // If script already loaded, just initialize
+    // @ts-ignore
+    if (window.google?.accounts?.id) {
+      initialize();
+      return;
     }
+
+    // Inject the GIS script dynamically
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = initialize;
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup: remove script tag to avoid duplicates when navigating back
+      if (script.parentNode) script.parentNode.removeChild(script);
+    };
   }, [navigate]);
   return (
     <main>
