@@ -4,6 +4,7 @@ const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const app = express();
+const helmet = require('helmet');
 // const path = require('path');
 const multer = require('multer');
 const UserModelLesson = require('./models/Lesson');
@@ -22,6 +23,29 @@ app.use(
     credentials: true
   })
 );
+// Security headers (CSP etc.)
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+
+// Configure a Content Security Policy that allows our front-end and Google Identity Services
+app.use(helmet.contentSecurityPolicy({
+  useDefaults: true,
+  directives: {
+    "default-src": ["'self'"],
+    "base-uri": ["'self'"],
+    "block-all-mixed-content": [],
+    "connect-src": ["'self'", "http://localhost:3000", "https://accounts.google.com", "https://www.googleapis.com", "https://*.gstatic.com"],
+    "font-src": ["'self'", "data:"],
+    "frame-ancestors": ["'self'"],
+    "frame-src": ["'self'", "https://accounts.google.com"],
+    "img-src": ["'self'", "data:", "blob:", "https://*.gstatic.com", "https://accounts.google.com"],
+    "script-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com", "https://*.gstatic.com"],
+    "style-src": ["'self'", "'unsafe-inline'"],
+    "object-src": ["'none'"]
+  }
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));

@@ -11,6 +11,21 @@
     />
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Content Security Policy for development (meta-based). Adjust for production headers on server. -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      base-uri 'self';
+      block-all-mixed-content;
+      connect-src 'self' http://localhost:5000 ws://localhost:3000 https://accounts.google.com https://www.googleapis.com https://*.gstatic.com;
+      font-src 'self' data:;
+      frame-ancestors 'self';
+      frame-src 'self' https://accounts.google.com;
+      img-src 'self' data: blob: https://*.gstatic.com https://accounts.google.com;
+      object-src 'none';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://*.gstatic.com;
+      style-src 'self' 'unsafe-inline';
+      upgrade-insecure-requests;
+    ">
     <link rel="apple-touch-icon" href="logo.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
