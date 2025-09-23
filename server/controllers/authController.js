@@ -13,6 +13,16 @@ if (googleClientId && googleClientId.length > 0) {
     googleClient = new OAuth2Client(googleClientId);
 }
 
+// Secure cookie options for session token
+const isProd = process.env.NODE_ENV === 'production';
+const sessionCookieOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
+};
+
 const test = (req, res) => {
     res.json('test is working')
 }
@@ -146,7 +156,7 @@ const loginStudent = async (req, res) => {
                 id: student._id
             }, process.env.JWT_SECRET, {expiresIn: '1d'}, (err, token) => {
                 if(err) throw err;
-                res.cookie('token', token).json(student)
+                res.cookie('token', token, sessionCookieOptions).json(student)
             })                
            
         }
@@ -284,7 +294,7 @@ const updateProfile = async(req, res) =>{
 
 //logout
 const logout = (req, res) => {
-    res.clearCookie('token').json({
+    res.clearCookie('token', { ...sessionCookieOptions }).json({
         message: 'Logged out successfully'
     })
 }
@@ -442,7 +452,7 @@ const loginTeacher = async (req, res) => {
                 id: teacher._id                
             }, process.env.JWT_SECRET, {expiresIn: '1d'}, (err, token) => {
                 if(err) throw err;
-                res.cookie('token', token).json(teacher)
+                res.cookie('token', token, sessionCookieOptions).json(teacher)
             })                
            
         }
@@ -667,7 +677,7 @@ const loginManager = async (req, res) => {
                 id: manager._id
             }, process.env.JWT_SECRET, {expiresIn: '1d'}, (err, token) => {
                 if(err) throw err;
-                res.cookie('token', token).json(manager)
+                res.cookie('token', token, sessionCookieOptions).json(manager)
             })                
            
         }
@@ -841,7 +851,7 @@ const loginAdmin = async (req, res) => {
                 id: admin._id
             }, process.env.JWT_SECRET, {expiresIn: '1d'}, (err, token) => {
                 if(err) throw err;
-                res.cookie('token', token).json(admin)
+                res.cookie('token', token, sessionCookieOptions).json(admin)
             })                
            
         }
@@ -973,7 +983,7 @@ module.exports = {
                     console.error(err);
                     return res.status(500).json({ error: 'Failed to create session' });
                 }
-                res.cookie('token', token).json(student);
+                res.cookie('token', token, sessionCookieOptions).json(student);
             });
         } catch (error) {
             console.error('googleLoginStudent error', error);
