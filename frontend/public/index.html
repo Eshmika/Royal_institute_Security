@@ -17,20 +17,22 @@
       default-src 'self';
       base-uri 'self';
       block-all-mixed-content;
-      connect-src 'self' http://localhost:5000 ws://localhost:3000 https://accounts.google.com https://www.googleapis.com https://*.gstatic.com;
+  connect-src 'self' http://localhost:5000 ws://localhost:3000 https://accounts.google.com https://www.googleapis.com;
       font-src 'self' data:;
       form-action 'self';
       frame-src 'self' https://accounts.google.com;
-      img-src 'self' data: blob: https://*.gstatic.com https://accounts.google.com;
+  img-src 'self' data: blob: https://ssl.gstatic.com https://accounts.google.com;
       manifest-src 'self';
       media-src 'self' data:;
       object-src 'none';
-  script-src 'self' https://accounts.google.com https://apis.google.com https://*.gstatic.com;
-      style-src 'self' 'unsafe-inline';
+  script-src 'self' https://accounts.google.com https://apis.google.com;
+    style-src 'self' 'nonce-dev-nonce-2025-09-23';
+    style-src-elem 'self' 'nonce-dev-nonce-2025-09-23';
       worker-src 'self' blob:;
       upgrade-insecure-requests;
     "
     />
+  <script src="/nonce.js" nonce="dev-nonce-2025-09-23"></script>
     <link rel="apple-touch-icon" href="logo.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a

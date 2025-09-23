@@ -49,42 +49,45 @@ app.use(
 // Ensure anti-MIME sniffing header
 app.use(helmet.noSniff());
 
-// Configure a Content Security Policy that allows our front-end and Google Identity Services
+// Configure a strict Content Security Policy to avoid implicit fallbacks
 app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true,
     directives: {
-      "default-src": ["'self'"],
+      // Disallow all by default and explicitly allow per-directive to avoid fallbacks
+      "default-src": ["'none'"],
+      // Disallow embedding by external sites; adjust if you legitimately frame this app
+      "frame-ancestors": ["'self'"],
+      // Restrict where forms can submit
+      "form-action": ["'self'"],
+      // Prevent injection via <base>
       "base-uri": ["'self'"],
+      // Mixed content hardening and auto-upgrade
       "block-all-mixed-content": [],
+      "upgrade-insecure-requests": [],
+      // Explicit allowances below; keep conservative for API responses
       "connect-src": [
         "'self'",
+        // Allow the front-end origin during local development if it fetches resources from API docs with CSP applied
         "http://localhost:3000",
+        // External account endpoints sometimes requested by clients; safe to include but keep minimal
         "https://accounts.google.com",
         "https://www.googleapis.com",
         "https://*.gstatic.com",
       ],
-      "font-src": ["'self'", "data:"],
-      "form-action": ["'self'"],
-      "frame-ancestors": ["'self'"],
-      "frame-src": ["'self'", "https://accounts.google.com"],
-      "img-src": [
-        "'self'",
-        "data:",
-        "blob:",
-        "https://*.gstatic.com",
-        "https://accounts.google.com",
-      ],
-      "manifest-src": ["'self'"],
+      // Static assets this API may serve (images/files)
+      "img-src": ["'self'", "data:", "blob:"],
       "media-src": ["'self'", "data:"],
-      "script-src": [
-        "'self'",
-        "https://accounts.google.com",
-        "https://apis.google.com",
-        "https://*.gstatic.com",
-      ],
-      "style-src": ["'self'", "'unsafe-inline'"],
+      "manifest-src": ["'self'"],
+      // This API doesn't need to execute scripts or styles; keep locked down
+      "script-src": ["'none'"],
+      // If you serve HTML responses needing inline styles, consider nonces or hashes instead of 'unsafe-inline'
+      "style-src": ["'self'"],
+      // Fonts if any are served directly from this host
+      "font-src": ["'self'", "data:"],
+      // Workers for things like PDF/image processing if needed
       "worker-src": ["'self'", "blob:"],
+      // Never allow plugins/Flash
       "object-src": ["'none'"],
     },
   })
