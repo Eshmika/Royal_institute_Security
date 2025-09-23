@@ -37,11 +37,15 @@ app.use(helmet.contentSecurityPolicy({
     "block-all-mixed-content": [],
     "connect-src": ["'self'", "http://localhost:3000", "https://accounts.google.com", "https://www.googleapis.com", "https://*.gstatic.com"],
     "font-src": ["'self'", "data:"],
+    "form-action": ["'self'"],
     "frame-ancestors": ["'self'"],
     "frame-src": ["'self'", "https://accounts.google.com"],
     "img-src": ["'self'", "data:", "blob:", "https://*.gstatic.com", "https://accounts.google.com"],
-    "script-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com", "https://*.gstatic.com"],
+    "manifest-src": ["'self'"],
+    "media-src": ["'self'", "data:"],
+  "script-src": ["'self'", "https://accounts.google.com", "https://apis.google.com", "https://*.gstatic.com"],
     "style-src": ["'self'", "'unsafe-inline'"],
+    "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"]
   }
 }));
