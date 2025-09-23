@@ -179,8 +179,9 @@ border: 2px solid black;
 	transform: scale(1);
 }
 .search-btn {
-	background: #171717;
-	border-radius: 0 0.75em 0.75em 0 / 0 1.5em 1.5em 0;
+  background: #171717;
+  /* Simplified to avoid elliptical border-radius with slash which breaks some minifiers */
+  border-radius: 0 0.75em 0.75em 0;
 	padding: 0.75em;
 	position: relative;
 	transform: translate(0.25em,0.25em) rotate(45deg) scale(0.25,0.125);
@@ -273,7 +274,8 @@ border: 2px solid black;
   align-items: center; /* Align items vertically */
   justify-content: center; /* Align items horizontally */
   background: #171717;
-  border-radius: 0 0.75em 0.75em 0 / 0 1.5em 1.5em 0;
+  /* Simplified to avoid elliptical border-radius with slash which breaks some minifiers */
+  border-radius: 0 0.75em 0.75em 0;
   padding: 0.75em;
   /* Remove 'position: relative;' */
   /* Remove 'transform: translate(0.25em,0.25em) rotate(45deg) scale(0.25,0.125);' */
