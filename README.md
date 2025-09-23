@@ -31,21 +31,35 @@ curl -i http://localhost:3000/ -H "Origin: http://localhost:3000"
 
 Expected: No wildcard `Access-Control-Allow-Origin: *`. Server should reflect allowed origin or block.
 
+## Anti-clickjacking (dev server)
+
+- The React dev server on port 3000 now sets anti-clickjacking headers via `frontend/craco.config.js`:
+  - `X-Frame-Options: SAMEORIGIN`
+  - `Content-Security-Policy: frame-ancestors 'self'`
+
+Verify with:
+
+```powershell
+curl.exe -i http://localhost:3000/ | findstr /I "x-frame-options content-security-policy"
+```
+
 ## Private IP disclosure (dev)
 
 Some dev setups embed the local network IP in the webpack dev server client (HMR) code, which can appear in `http://localhost:3000/static/js/bundle.js`.
 
 Mitigation added:
- - `frontend/craco.config.js` forces dev server `host` and client WebSocket hostname to `localhost`.
- - `frontend/.env.development` sets `HOST` and `WDS_SOCKET_HOST` to `localhost`.
+
+- `frontend/craco.config.js` forces dev server `host` and client WebSocket hostname to `localhost`.
+- `frontend/.env.development` sets `HOST` and `WDS_SOCKET_HOST` to `localhost`.
 
 Verify:
- - Start the frontend with `npm start` in `frontend/`.
- - Fetch the bundle and search for private IPs:
-   ```powershell
-   curl.exe -s http://localhost:3000/static/js/bundle.js | Select-String -Pattern '10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.'
-   ```
-   Expect no matches.
+
+- Start the frontend with `npm start` in `frontend/`.
+- Fetch the bundle and search for private IPs:
+  ```powershell
+  curl.exe -s http://localhost:3000/static/js/bundle.js | Select-String -Pattern '10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.'
+  ```
+  Expect no matches.
 
 # SLIIT-Y2S2-ITPproject-Royal_institute
 
