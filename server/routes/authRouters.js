@@ -5,6 +5,7 @@ const { test,
     registerStudent,
     loginStudent,
     googleLoginStudent,
+    googleSignupStudent,
     forgotPasswordstudent,
     getProfile,
     getProfileid,
@@ -48,6 +49,7 @@ router.get('/', test)
 router.post('/register', registerStudent)
 router.post('/login', loginStudent)
 router.post('/google-login', googleLoginStudent)
+router.post('/google-signup', googleSignupStudent)
 router.post('/forgotpassword', forgotPasswordstudent)
 router.get('/studentprofile', getProfile)
 router.get('/studentprofileid/:id', getProfileid)

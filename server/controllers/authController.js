@@ -6,6 +6,7 @@ const Wallet = require('../models/Wallets');
 const { hashPassword, comparePassword } = require('../helpers/auth');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
+const crypto = require('crypto');
 
 const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
 let googleClient;
@@ -974,7 +975,8 @@ module.exports = {
             // Find existing student by email
             const student = await Student.findOne({ email });
             if (!student) {
-                return res.status(404).json({ error: 'No student found for this Google email. Please register first.' });
+                // Keep consistent with other login endpoints that return 200 + { error }
+                return res.json({ error: 'No student found for this Google email. Please register first.' });
             }
 
             // Issue same JWT cookie as password login
@@ -987,6 +989,94 @@ module.exports = {
             });
         } catch (error) {
             console.error('googleLoginStudent error', error);
+            return res.status(401).json({ error: 'Invalid Google credential' });
+        }
+    },
+    // Google OAuth Signup (Student)
+    googleSignupStudent: async (req, res) => {
+        try {
+            if (!googleClientId || !googleClient) {
+                return res.status(500).json({ error: 'Google OAuth not configured on server' });
+            }
+            const { credential, grade, username, contactnumber } = req.body || {};
+            if (!credential) {
+                return res.status(400).json({ error: 'Missing Google credential' });
+            }
+            if (!grade) {
+                return res.json({ error: 'Grade is required' });
+            }
+            if (!username) {
+                return res.json({ error: 'Username is required' });
+            }
+
+            // Verify ID token and extract profile
+            const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: googleClientId });
+            const payload = ticket.getPayload();
+            const email = payload?.email;
+            const name = payload?.name || 'Student';
+
+            if (!email) {
+                return res.status(400).json({ error: 'Google account has no email' });
+            }
+
+            // If already exists, instruct to login instead
+            const existing = await Student.findOne({ email });
+            if (existing) {
+                return res.json({ error: 'Student already exists for this Google email. Please login with Google.' });
+            }
+
+            // Ensure username unique
+            const existusername = await Student.findOne({ username });
+            if (existusername) {
+                return res.json({ error: 'Username is already in use' });
+            }
+
+            // Generate stdid as in client: SID + YY + 4 digits
+            const year = new Date().getFullYear().toString().slice(-2);
+            const rand4 = Math.floor(1000 + Math.random() * 9000);
+            let stdid = `SID${year}${rand4}`;
+            // Ensure uniqueness; retry a few times just in case
+            for (let i = 0; i < 5; i++) {
+                const dup = await Student.findOne({ stdid });
+                if (!dup) break;
+                const r = Math.floor(1000 + Math.random() * 9000);
+                stdid = `SID${year}${r}`;
+            }
+
+            // Generate a wallet id and create wallet
+            const walletid = `WID${Math.floor(1000 + Math.random() * 9000)}`;
+
+            // Generate a random password and hash (user can reset later if they want password login)
+            const tempPassword = crypto.randomBytes(12).toString('hex');
+            const hashedPassword = await hashPassword(tempPassword);
+
+            const student = await Student.create({
+                name,
+                email,
+                contactnumber: contactnumber || '',
+                grade,
+                username,
+                stdid,
+                password: hashedPassword,
+            });
+
+            await Wallet.create({
+                stdid,
+                studentname: name,
+                walletid,
+                balance: '0.00',
+            });
+
+            // Issue session cookie
+            jwt.sign({ id: student._id }, process.env.JWT_SECRET, { expiresIn: '1d' }, (err, token) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ error: 'Failed to create session' });
+                }
+                return res.cookie('token', token, sessionCookieOptions).json({ student });
+            });
+        } catch (error) {
+            console.error('googleSignupStudent error', error);
             return res.status(401).json({ error: 'Invalid Google credential' });
         }
     },

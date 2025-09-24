@@ -3,6 +3,7 @@ import Portal from './screen/Portal';
 
 import StudentLogin from './screen/Student/User_Management/StudentLogin';
 import StudentRegister from './screen/Student/User_Management/StudentRegister';
+import GoogleStudentSignup from './screen/Student/User_Management/GoogleStudentSignup';
 import StudentProfile from './screen/Student/User_Management/StudentProfile';
 import StudentProfileEdit from './screen/Student/User_Management/StudentProfieEdit';
 import StudentForgetPassword from './screen/Student/User_Management/Forgetpasswordstudent';
@@ -142,6 +143,7 @@ function App() {
 
       <Route path="/login" element={ <StudentLogin /> } />
       <Route path="/register" element={ <StudentRegister />} />
+  <Route path="/google-signup" element={<GoogleStudentSignup />} />
       <Route path="/studentprofile" element={<StudentProfile />} />
       <Route path='/studentprofileedit' element={<StudentProfileEdit/>}/> 
       <Route path='/studentforgetpassword' element={<StudentForgetPassword/>}/>

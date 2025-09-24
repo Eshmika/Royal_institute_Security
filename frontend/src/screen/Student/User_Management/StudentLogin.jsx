@@ -21,7 +21,8 @@ function StudentLogin() {
       if(data.error){
         toast.error(data.error);
       }else{
-        setData({});
+        // Keep controlled inputs in a valid state
+        setData({ username: '', password: '' });
         navigate('/studentdashboard');
       }
     } catch (error) {
@@ -45,13 +46,24 @@ function StudentLogin() {
             try {
               const { data: resp } = await axios.post('/google-login', { credential: response.credential });
               if (resp?.error) {
+                // If the error indicates no account, redirect to Google signup onboarding
+                if (resp.error.toLowerCase().includes('no student') || resp.error.toLowerCase().includes('register')) {
+                  navigate('/google-signup', { state: { credential: response.credential } });
+                  return;
+                }
                 toast.error(resp.error);
                 return;
               }
               navigate('/studentdashboard');
             } catch (err) {
               console.error(err);
-              toast.error('Google Sign-In failed');
+              // Surface server-provided error message when available (e.g., 404 when student not found)
+              const serverMsg = (err && err.response && err.response.data && err.response.data.error) ? err.response.data.error : null;
+              if (serverMsg && (serverMsg.toLowerCase().includes('no student') || serverMsg.toLowerCase().includes('register'))) {
+                navigate('/google-signup', { state: { credential: response.credential } });
+              } else {
+                toast.error(serverMsg || 'Google Sign-In failed');
+              }
             }
           },
           context: 'signin',
